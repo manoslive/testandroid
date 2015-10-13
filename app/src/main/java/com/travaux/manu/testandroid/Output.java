@@ -10,8 +10,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -19,7 +17,6 @@ import java.net.MulticastSocket;
 
 public class Output extends AppCompatActivity {
     private Handler uiHandler;
-    static final int DELAI = 2000;
     static final int LONG_TAMPON = 1024;
 
 
@@ -44,7 +41,6 @@ public class Output extends AppCompatActivity {
                 ((TextView)findViewById(R.id.TB_ConteneurMessage)).append(string);
             }
         };
-
         recevoir();
     }
 
@@ -101,34 +97,29 @@ public class Output extends AppCompatActivity {
         envoyer();
     }
 
-
     public void envoyer(){
         new Thread(new Runnable() {
             Intent intent = getIntent();
             String msg = ((TextView) findViewById(R.id.TB_Message)).getText().toString();
+            String pseudo = intent.getStringExtra("pseudo");
+            String ip = intent.getStringExtra("cast");
+            int port = intent.getIntExtra("port", -1);
             @Override
             public void run() {
                 try {
-                    msg = intent.getStringExtra("pseudo") + ": " + msg;
+                    msg = pseudo + ": " + msg;
                     byte tampon[] = msg.getBytes();
 
-                    InetAddress adrMulticast = InetAddress.getByName(intent.getStringExtra("cast"));
+                    InetAddress adrMulticast = InetAddress.getByName(ip);
                     MulticastSocket soc = new MulticastSocket();
-                    soc.joinGroup(adrMulticast);
+                    //soc.joinGroup(adrMulticast);
 
                     DatagramPacket paquet =
-                            new DatagramPacket(tampon, 0, tampon.length, adrMulticast, intent.getIntExtra("port", -1));
+                            new DatagramPacket(tampon, 0, tampon.length, adrMulticast, port);
 
                     soc.send(paquet);
 
-                    try {
-                        Thread.sleep(DELAI);
-                    } catch (InterruptedException ie) {
-                    }
-
                 } catch (Exception e) {
-                    System.err.println("Houston we have a problem");
-                    e.printStackTrace();
                 }
             }
         }).start();
