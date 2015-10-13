@@ -24,7 +24,6 @@
         android:id="@+id/TB_Port"
         android:width="23dp"
         android:editable="true"
-        android:text="6000"
         android:layout_above="@+id/LB_Pseudo"
         android:layout_alignEnd="@+id/region_spinner"
         android:layout_alignStart="@+id/BTN_Start"
