@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">testandroid</string>
+    <string name="app_name">HobbitChat</string>
+    <string name="message_bouton">Envoyer</string>
+    <string name="port">Port :</string>
+    <string name="pseudo">Pseudonyme :</string>
+    <string name="ip">Afficher Ips</string>
 </resources>

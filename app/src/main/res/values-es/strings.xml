@@ -1,0 +1,5 @@
+<resources>
+    <string name="message_bouton">Enviar</string>
+    <string name="pseudo">Seudónimo :</string>
+    <string name="ip">Ver IP</string>
+</resources>

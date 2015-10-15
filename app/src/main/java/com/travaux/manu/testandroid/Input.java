@@ -33,6 +33,37 @@ public class Input extends AppCompatActivity {
         checkInputs();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // ici on met dans le bundle les données à sauvegarder
+        outState.putString("username", ((TextView) findViewById(R.id.TB_Pseudo)).getText().toString());
+        outState.putInt("ip", Integer.parseInt(((TextView) findViewById(R.id.TB_Port)).getText().toString()));
+        outState.putInt("spinnerPosition", ((Spinner) findViewById(R.id.region_spinner)).getSelectedItemPosition());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        // ici on récupère les données du bundle
+        String username = savedInstanceState.getString("username");
+        int ip = savedInstanceState.getInt("ip");
+        int spinnerPosition = savedInstanceState.getInt("spinnerPosition");
+
+        if(username.isEmpty())
+            username.equals("");
+        if(ip==0)
+            ip = 6000;
+        if(spinnerPosition < 0 || spinnerPosition > 2)
+            spinnerPosition = 0;
+
+        // Rétablissement des données
+        ((TextView) findViewById(R.id.TB_Pseudo)).setText(username);
+        ((TextView) findViewById(R.id.TB_Port)).setText(String.valueOf(ip));
+        ((Spinner) findViewById(R.id.region_spinner)).setSelection(spinnerPosition);
+    }
 
     public void fillSpinner() {
         Spinner spinner;
@@ -96,6 +127,7 @@ public class Input extends AppCompatActivity {
 
                                                  } else {
                                                      Toast.makeText(getApplicationContext(), "Votre pseudo doit contenir de 2-8 caractères", Toast.LENGTH_SHORT);
+                                                     pseudoEstValide = false;
                                                      nameInput.setTextColor(Color.RED);
                                                  }
                                              }
@@ -121,6 +153,7 @@ public class Input extends AppCompatActivity {
                     if ((Integer.parseInt(portInput.getText().toString()) <= PORTMIN) || (Integer.parseInt(portInput.getText().toString()) >= PORTMAX)) {
                         Toast.makeText(getApplicationContext(), "Le numéro de port doit se situer entre 1024 et 65535", Toast.LENGTH_SHORT);
                         portInput.setTextColor(Color.RED);
+                        portEstValide = false;
                     } else {
                         portEstValide = true;
                         portInput.setTextColor(Color.BLACK);

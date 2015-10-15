@@ -23,7 +23,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/TB_Port"
         android:width="23dp"
-        android:maxLength="5"
         android:editable="true"
         android:layout_above="@+id/LB_Pseudo"
         android:layout_alignEnd="@+id/region_spinner"

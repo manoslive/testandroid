@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -58,13 +59,37 @@ public class Output extends AppCompatActivity {
         recevoir();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // ici on met dans le bundle les données à sauvegarder
+        outState.putString("messageList", ((TextView) findViewById(R.id.TB_ConteneurMessage)).getText().toString());
+        outState.putString("message", ((TextView) findViewById(R.id.TB_Message)).getText().toString());
+        outState.putBoolean("checked", ((CheckBox) findViewById(R.id.CB_ShowIp)).isChecked());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        // ici on récupère les données du bundle
+        String messageList = savedInstanceState.getString("messageList");
+        String message = savedInstanceState.getString("message");
+        Boolean checked = savedInstanceState.getBoolean("checked");
+
+        // Rétablissement des données
+        ((TextView) findViewById(R.id.TB_ConteneurMessage)).setText(messageList);
+        ((TextView) findViewById(R.id.TB_Message)).setText(message);
+        ((CheckBox) findViewById(R.id.CB_ShowIp)).setChecked(checked);
+    }
+
     public void recevoir() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 Bundle bundle = new Bundle();
                 Intent intent = getIntent();
-                String pseudo = intent.getStringExtra("pseudo");
                 String groupIp = intent.getStringExtra("cast");
                 int port = intent.getIntExtra("port", -1);
 
@@ -75,17 +100,14 @@ public class Output extends AppCompatActivity {
                             new DatagramPacket(tampon, 0, LONG_TAMPON);
 
                     MulticastSocket socket;
-                    //InetAddress group1 = InetAddress.getByName(groupIp);
-                    InetAddress group2 = InetAddress.getByName("230.0.0.2");
-                    InetAddress group3 = InetAddress.getByName("230.0.0.3");
+                    InetAddress group = InetAddress.getByName(groupIp);
 
                     try {
                         // On creer le socket
                         socket = new MulticastSocket(port);
                         // On rejoint le group de listening
-                        //socket.joinGroup(group1);
-                        socket.joinGroup(group2);
-                        socket.joinGroup(group3);
+                        socket.joinGroup(group);
+
                         while (true) {
                             try {
                                 // on recoit les message et ensuite on affiche ..
@@ -114,7 +136,7 @@ public class Output extends AppCompatActivity {
     }
 
     public void envoyerMessage(View v) {
-        TextView tv = (TextView)findViewById(R.id.TB_Message);
+        TextView tv = (TextView) findViewById(R.id.TB_Message);
 
         if (!tv.getText().toString().equals(""))
             envoyer();
@@ -141,35 +163,15 @@ public class Output extends AppCompatActivity {
                     InetAddress adrMulticast;
                     MulticastSocket soc;
 
-                    if (groupIp.equals("230.0.0.1")) {
-                        // adrMulticast = InetAddress.getByName(groupIp);
-                        InetAddress adr2 = InetAddress.getByName("230.0.0.2");
-                        InetAddress adr3 = InetAddress.getByName("230.0.0.3");
-                        soc = new MulticastSocket();
-
-                        //soc.joinGroup(adrMulticast);
-                        soc.joinGroup(adr2);
-                        soc.joinGroup(adr3);
-
-                        //DatagramPacket paquet1 =
-                        //        new DatagramPacket(tampon, 0, tampon.length, adrMulticast, port);
-                        DatagramPacket paquet2 =
-                                new DatagramPacket(tampon, 0, tampon.length, adr2, port);
-                        DatagramPacket paquet3 =
-                                new DatagramPacket(tampon, 0, tampon.length, adr3, port);
-                        //soc.send(paquet1);
-                        soc.send(paquet2);
-                        soc.send(paquet3);
-                    } else {
-                        adrMulticast = InetAddress.getByName(groupIp);
-                        soc = new MulticastSocket();
-                        soc.joinGroup(adrMulticast);
+                    adrMulticast = InetAddress.getByName(groupIp);
+                    soc = new MulticastSocket();
+                    soc.joinGroup(adrMulticast);
 
 
-                        DatagramPacket paquet =
-                                new DatagramPacket(tampon, 0, tampon.length, adrMulticast, port);
-                        soc.send(paquet);
-                    }
+                    DatagramPacket paquet =
+                            new DatagramPacket(tampon, 0, tampon.length, adrMulticast, port);
+                    soc.send(paquet);
+
 
                 } catch (Exception e) {
                 }
@@ -201,7 +203,7 @@ public class Output extends AppCompatActivity {
         try {
             for (Enumeration<NetworkInterface> en = NetworkInterface
                     .getNetworkInterfaces(); en.hasMoreElements(); ) {
-                NetworkInterface intf = (NetworkInterface) en.nextElement();
+                NetworkInterface intf = en.nextElement();
                 for (Enumeration<InetAddress> enumIpAddr = intf
                         .getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
                     InetAddress inetAddress = enumIpAddr.nextElement();
